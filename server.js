@@ -242,22 +242,36 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Optional: Cron job with debugging (uncomment to enable)
-/*
-cron.schedule('0 30 9 * * *', async () => {
+// 🕐 AUTOMATED MESSAGE SCHEDULING - DAILY AT 5:00 PM
+cron.schedule('0 17 * * *', async () => {
   const timestamp = new Date().toISOString();
-  console.log(`\n⏰ [${timestamp}] CRON JOB: Scheduled message trigger`);
+  console.log(`\n⏰ [${timestamp}] CRON TRIGGER: Daily 5:00 PM automated message`);
+  console.log('🔥 Sending scheduled WhatsApp message...');
+  
   try {
-    console.log('🔄 Sending scheduled hello_world message...');
     const result = await sendHelloWorld();
-    console.log(`✅ CRON SUCCESS: Message sent at ${timestamp}`);
-    console.log(`📊 Result: ${JSON.stringify(result, null, 2)}`);
+    console.log('✅ CRON SUCCESS: Daily 5 PM message sent successfully!');
+    console.log(`📊 Message Details: ${JSON.stringify(result, null, 2)}`);
+    console.log(`📱 Sent to: ${RECIPIENT}`);
+    console.log(`⏰ Time: ${new Date().toLocaleString()}`);
   } catch (error) {
-    console.error(`❌ CRON FAILED: ${error.message}`);
-    console.error(`📋 Error at ${timestamp}: ${error.stack}`);
+    console.error(`❌ CRON FAILED: Daily 5 PM message failed`);
+    console.error(`📋 Error: ${error.message}`);
+    console.error(`🕐 Failed at: ${new Date().toLocaleString()}`);
   }
 });
-*/
+
+// Optional: Test cron job that runs every minute (uncomment for testing)
+// cron.schedule('* * * * *', async () => {
+//   const timestamp = new Date().toISOString();
+//   console.log(`\n🧪 [${timestamp}] TEST CRON: Every minute trigger`);
+//   try {
+//     const result = await sendHelloWorld();
+//     console.log('✅ TEST CRON SUCCESS: Message sent');
+//   } catch (error) {
+//     console.error(`❌ TEST CRON FAILED: ${error.message}`);
+//   }
+// });
 
 // Global error handlers
 process.on('uncaughtException', (error) => {
@@ -283,6 +297,24 @@ app.listen(PORT, () => {
   console.log(`   ├── GET  /           → Web interface`);
   console.log(`   ├── POST /api/send   → Send WhatsApp message`);
   console.log(`   └── GET  /api/health → Health check`);
+  console.log('\n⏰ Automated Scheduling:');
+  console.log(`   ├── Daily at 5:00 PM: ✅ ACTIVE`);
+  console.log(`   ├── Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
+  console.log(`   ├── Current Time: ${new Date().toLocaleString()}`);
+  console.log(`   └── Next 5 PM: ${getNext5PM()}`);
   console.log('\n🔥 Ready to send WhatsApp messages!');
   console.log('💡 Visit http://localhost:3000 to use the web interface');
 });
+
+// Helper function to show next 5 PM
+function getNext5PM() {
+  const now = new Date();
+  const next5PM = new Date();
+  next5PM.setHours(17, 0, 0, 0);
+  
+  if (now.getHours() >= 17) {
+    next5PM.setDate(next5PM.getDate() + 1);
+  }
+  
+  return next5PM.toLocaleString();
+}
