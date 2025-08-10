@@ -18,6 +18,9 @@ const {
   PORT = 3000,
 } = process.env;
 
+// Set timezone to IST (Indian Standard Time)
+process.env.TZ = 'Asia/Kolkata';
+
 // Startup validation
 console.log('🚀 Starting WhatsApp Message Server...');
 console.log('📋 Configuration Check:');
@@ -25,6 +28,7 @@ console.log(`   ├── Phone Number ID: ${PHONE_NUMBER_ID ? '✅ Set' : '❌ 
 console.log(`   ├── WhatsApp Token: ${WHATSAPP_TOKEN ? `✅ Set (${WHATSAPP_TOKEN.substring(0, 10)}...)` : '❌ Missing'}`);
 console.log(`   ├── Default Recipient: ${RECIPIENT ? '✅ Set' : '❌ Missing'}`);
 console.log(`   ├── Graph Version: ${GRAPH_VERSION}`);
+console.log(`   ├── Timezone: ${process.env.TZ}`);
 console.log(`   └── Port: ${PORT}`);
 
 if (!PHONE_NUMBER_ID || !WHATSAPP_TOKEN) {
@@ -92,7 +96,6 @@ async function sendHelloWorld(toNumber = RECIPIENT) {
 
     console.log(`📡 Response received in ${duration}ms`);
     console.log(`   ├── Status: ${res.status} ${res.statusText}`);
-    console.log(`   ├── Headers: ${JSON.stringify(Object.fromEntries(res.headers.entries()), null, 2)}`);
 
     let data;
     try {
@@ -231,7 +234,8 @@ app.get('/api/health', (req, res) => {
       nodeVersion: process.version,
       platform: process.platform,
       uptime: process.uptime(),
-      memoryUsage: process.memoryUsage()
+      memoryUsage: process.memoryUsage(),
+      timezone: process.env.TZ
     },
     config: {
       hasPhoneNumberId: !!PHONE_NUMBER_ID,
@@ -242,29 +246,31 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 🕐 AUTOMATED MESSAGE SCHEDULING - DAILY AT 5:00 PM
-cron.schedule('0 17 * * *', async () => {
+// 🕐 AUTOMATED MESSAGE SCHEDULING - DAILY AT 5:30 PM
+cron.schedule('30 17 * * *', async () => {
   const timestamp = new Date().toISOString();
-  console.log(`\n⏰ [${timestamp}] CRON TRIGGER: Daily 5:00 PM automated message`);
+  const localTime = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+  console.log(`\n⏰ [${timestamp}] CRON TRIGGER: Daily 5:30 PM automated message`);
+  console.log(`🇮🇳 Local Time: ${localTime}`);
   console.log('🔥 Sending scheduled WhatsApp message...');
   
   try {
     const result = await sendHelloWorld();
-    console.log('✅ CRON SUCCESS: Daily 5 PM message sent successfully!');
+    console.log('✅ CRON SUCCESS: Daily 5:30 PM message sent successfully!');
     console.log(`📊 Message Details: ${JSON.stringify(result, null, 2)}`);
     console.log(`📱 Sent to: ${RECIPIENT}`);
-    console.log(`⏰ Time: ${new Date().toLocaleString()}`);
+    console.log(`⏰ Sent at: ${localTime}`);
   } catch (error) {
-    console.error(`❌ CRON FAILED: Daily 5 PM message failed`);
+    console.error(`❌ CRON FAILED: Daily 5:30 PM message failed`);
     console.error(`📋 Error: ${error.message}`);
-    console.error(`🕐 Failed at: ${new Date().toLocaleString()}`);
+    console.error(`🕐 Failed at: ${localTime}`);
   }
 });
 
-// Optional: Test cron job that runs every minute (uncomment for testing)
-// cron.schedule('* * * * *', async () => {
+// Optional: Test cron job that runs every 2 minutes (uncomment for testing)
+// cron.schedule('*/2 * * * *', async () => {
 //   const timestamp = new Date().toISOString();
-//   console.log(`\n🧪 [${timestamp}] TEST CRON: Every minute trigger`);
+//   console.log(`\n🧪 [${timestamp}] TEST CRON: Every 2 minutes trigger`);
 //   try {
 //     const result = await sendHelloWorld();
 //     console.log('✅ TEST CRON SUCCESS: Message sent');
@@ -284,6 +290,19 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('Reason:', reason);
 });
 
+// Helper function to show next 5:30 PM
+function getNext530PM() {
+  const now = new Date();
+  const next530PM = new Date();
+  next530PM.setHours(17, 30, 0, 0);
+  
+  if (now.getHours() > 17 || (now.getHours() === 17 && now.getMinutes() >= 30)) {
+    next530PM.setDate(next530PM.getDate() + 1);
+  }
+  
+  return next530PM.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+}
+
 // Start server with debugging
 app.listen(PORT, () => {
   console.log('\n🎉 Server started successfully!');
@@ -292,29 +311,17 @@ app.listen(PORT, () => {
   console.log(`   ├── Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`   ├── Node Version: ${process.version}`);
   console.log(`   ├── Platform: ${process.platform}`);
+  console.log(`   ├── Timezone: ${process.env.TZ}`);
   console.log(`   └── Process ID: ${process.pid}`);
   console.log('\n📡 Available Endpoints:');
   console.log(`   ├── GET  /           → Web interface`);
   console.log(`   ├── POST /api/send   → Send WhatsApp message`);
   console.log(`   └── GET  /api/health → Health check`);
   console.log('\n⏰ Automated Scheduling:');
-  console.log(`   ├── Daily at 5:00 PM: ✅ ACTIVE`);
-  console.log(`   ├── Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
-  console.log(`   ├── Current Time: ${new Date().toLocaleString()}`);
-  console.log(`   └── Next 5 PM: ${getNext5PM()}`);
+  console.log(`   ├── Daily at 5:30 PM IST: ✅ ACTIVE`);
+  console.log(`   ├── Timezone: ${process.env.TZ}`);
+  console.log(`   ├── Current Time: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
+  console.log(`   └── Next 5:30 PM: ${getNext530PM()}`);
   console.log('\n🔥 Ready to send WhatsApp messages!');
-  console.log('💡 Visit http://localhost:3000 to use the web interface');
+  console.log('💡 Local testing: http://localhost:3000');
 });
-
-// Helper function to show next 5 PM
-function getNext5PM() {
-  const now = new Date();
-  const next5PM = new Date();
-  next5PM.setHours(17, 0, 0, 0);
-  
-  if (now.getHours() >= 17) {
-    next5PM.setDate(next5PM.getDate() + 1);
-  }
-  
-  return next5PM.toLocaleString();
-}
