@@ -52,7 +52,21 @@ class WhatsAppService {
 
             if (!response.ok) {
                 logger.error(`WhatsApp API error (${response.status}):`, data);
-                throw new Error(`WhatsApp API error: ${data.error?.message || response.statusText}`);
+
+                // Provide user-friendly error messages
+                const errorCode = data.error?.code;
+                const errorMessage = data.error?.message || response.statusText;
+
+                let userMessage = errorMessage;
+                if (errorCode === 131000) {
+                    userMessage = 'Template message failed. Please verify your template is approved in Meta Business Manager.';
+                } else if (errorCode === 131026) {
+                    userMessage = 'Message could not be delivered. The recipient may have blocked your business number.';
+                } else if (errorCode === 131047) {
+                    userMessage = 'Rate limit exceeded. Please wait before sending more messages.';
+                }
+
+                throw new Error(userMessage);
             }
 
             logger.success(`Message sent successfully in ${duration}ms`);
@@ -105,7 +119,23 @@ class WhatsAppService {
 
             if (!response.ok) {
                 logger.error(`WhatsApp API error (${response.status}):`, data);
-                throw new Error(`WhatsApp API error: ${data.error?.message || response.statusText}`);
+
+                // Provide user-friendly error messages
+                const errorCode = data.error?.code;
+                const errorMessage = data.error?.message || response.statusText;
+
+                let userMessage = errorMessage;
+                if (errorCode === 131000) {
+                    userMessage = 'Cannot send custom text message. You need an active 24-hour conversation window with this recipient. Use a template message instead, or wait for the recipient to message you first.';
+                } else if (errorCode === 131026) {
+                    userMessage = 'Message could not be delivered. The recipient may have blocked your business number.';
+                } else if (errorCode === 131047) {
+                    userMessage = 'Rate limit exceeded. Please wait before sending more messages.';
+                } else if (errorCode === 131051) {
+                    userMessage = 'This phone number is not registered with WhatsApp Business API.';
+                }
+
+                throw new Error(userMessage);
             }
 
             logger.success(`Text message sent successfully`);
