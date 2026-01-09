@@ -1,7 +1,7 @@
 {
   "name": "whatsapp-automation-bot",
   "version": "1.0.0",
-  "description": "WhatsApp automation bot with 5:30 PM daily scheduling",
+  "description": "Automated WhatsApp message scheduler with one-time and recurring scheduling capabilities. Features a premium dark-themed web interface for easy message management.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -16,7 +16,19 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": ["whatsapp", "automation", "cron", "bot"],
+  "keywords": [
+    "whatsapp",
+    "automation",
+    "scheduler",
+    "messaging",
+    "cron",
+    "bot",
+    "whatsapp-api"
+  ],
   "author": "Your Name",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/Automated-whatsapp-message.git"
+  }
 }
