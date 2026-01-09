@@ -1,98 +1,151 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <title>WhatsApp Automation Bot - 5:30 PM Daily</title>
-  <style>
-    body { font-family: system-ui, Arial, sans-serif; padding: 24px; background: #f5f5f5; }
-    .wrap { max-width: 600px; margin: 0 auto; background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    h1 { color: #25D366; margin-bottom: 24px; }
-    button { padding: 12px 20px; font-size: 16px; cursor: pointer; background: #25D366; color: white; border: none; border-radius: 8px; margin: 8px; }
-    button:hover { background: #128C7E; }
-    input { padding: 12px; font-size: 14px; width: 100%; margin-bottom: 16px; border: 1px solid #ddd; border-radius: 8px; }
-    .log { white-space: pre-wrap; background: #f8f8f8; padding: 16px; border-radius: 8px; min-height: 100px; margin-top: 16px; font-family: monospace; }
-    .status { background: #e3f2fd; padding: 16px; border-radius: 8px; margin-bottom: 24px; }
-    .cron-info { background: #fff3cd; padding: 16px; border-radius: 8px; margin-bottom: 16px; }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Automation | Message Scheduler</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/components.css">
 </head>
+
 <body>
-  <div class="wrap">
-    <h1>📱 WhatsApp Automation Bot</h1>
-    
-    <div class="cron-info">
-      <h3>⏰ Automated Schedule</h3>
-      <p><strong>Daily at 5:30 PM IST</strong> - Messages sent automatically to the default recipient</p>
-      <p>Current Server Time: <span id="currentTime"></span></p>
+  <div class="container">
+    <!-- Header -->
+    <header class="header fade-in">
+      <div class="header-title">
+        <span class="header-icon">📱</span>
+        <h1>WhatsApp Automation</h1>
+      </div>
+      <p class="header-subtitle">Schedule and send automated WhatsApp messages with ease</p>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="grid grid-2">
+      <!-- Send Message Card -->
+      <div class="card card-glass fade-in">
+        <div class="card-header">
+          <h3 class="card-title">📤 Send Message</h3>
+          <span class="status-badge success">
+            <span class="status-dot"></span>
+            Ready
+          </span>
+        </div>
+
+        <form id="sendMessageForm">
+          <div class="input-group">
+            <label class="input-label" for="sendRecipient">Recipient Phone Number</label>
+            <input type="text" id="sendRecipient" class="input" placeholder="919444539625" required>
+            <small class="text-muted">E.164 format (e.g., 919444539625)</small>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="sendMessage">Message (Optional)</label>
+            <textarea id="sendMessage" class="input textarea"
+              placeholder="Leave empty to use default template..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-success" id="sendBtn">
+            <span>Send Now</span>
+            <span>✓</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Schedule Message Card -->
+      <div class="card card-glass fade-in">
+        <div class="card-header">
+          <h3 class="card-title">⏰ Schedule Message</h3>
+          <span class="card-badge">New</span>
+        </div>
+
+        <form id="scheduleMessageForm">
+          <div class="input-group">
+            <label class="input-label" for="scheduleRecipient">Recipient Phone Number</label>
+            <input type="text" id="scheduleRecipient" class="input" placeholder="919444539625" required>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="scheduleMessage">Message (Optional)</label>
+            <textarea id="scheduleMessage" class="input textarea"
+              placeholder="Leave empty to use default template..."></textarea>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="scheduleType">Schedule Type</label>
+            <select id="scheduleType" class="select">
+              <option value="one-time">One-time</option>
+              <option value="recurring">Recurring</option>
+            </select>
+          </div>
+
+          <!-- One-time scheduling -->
+          <div id="oneTimeSchedule" class="input-group">
+            <label class="input-label" for="scheduleDateTime">Date & Time</label>
+            <input type="datetime-local" id="scheduleDateTime" class="input">
+          </div>
+
+          <!-- Recurring scheduling -->
+          <div id="recurringSchedule" class="input-group" style="display: none;">
+            <label class="input-label" for="cronExpression">Cron Expression</label>
+            <input type="text" id="cronExpression" class="input" placeholder="0 17 * * *">
+            <small class="text-muted">Example: "0 17 * * *" = Daily at 5:00 PM</small>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="scheduleBtn">
+            <span>Schedule Message</span>
+            <span>⏰</span>
+          </button>
+        </form>
+      </div>
     </div>
 
-    <div class="status">
-      <h3>📊 Server Status</h3>
-      <button id="healthBtn">Check Health</button>
-      <div id="healthStatus"></div>
+    <!-- Scheduled Messages List -->
+    <div class="card card-glass fade-in" style="margin-top: var(--space-lg);">
+      <div class="card-header">
+        <h3 class="card-title">📋 Scheduled Messages</h3>
+        <button class="btn btn-secondary btn-sm" id="refreshBtn">
+          <span>Refresh</span>
+          <span>🔄</span>
+        </button>
+      </div>
+
+      <div id="scheduledListContainer">
+        <div class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          <p>No scheduled messages</p>
+        </div>
+      </div>
     </div>
 
-    <h3>📤 Manual Message Send</h3>
-    <label>Recipient (E.164 format, e.g., 919444539625):</label>
-    <input id="to" placeholder="919444539625" />
-    <button id="sendBtn">Send WhatsApp Message</button>
-    
-    <div class="log" id="log">Click "Send WhatsApp Message" to test manually...</div>
+    <!-- Server Status -->
+    <div class="card card-glass fade-in" style="margin-top: var(--space-lg);">
+      <div class="card-header">
+        <h3 class="card-title">🏥 Server Status</h3>
+        <button class="btn btn-secondary btn-sm" id="healthCheckBtn">
+          <span>Check Health</span>
+        </button>
+      </div>
+
+      <div id="healthStatus">
+        <p class="text-muted">Click "Check Health" to view server status</p>
+      </div>
+    </div>
   </div>
 
-  <script>
-    // Update current time every second
-    function updateTime() {
-      const now = new Date();
-      const istTime = now.toLocaleString('en-IN', { 
-        timeZone: 'Asia/Kolkata',
-        hour12: true 
-      });
-      document.getElementById('currentTime').textContent = istTime;
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
+  <!-- Toast Container -->
+  <div id="toastContainer"></div>
 
-    // Send manual message
-    async function send() {
-      const to = document.getElementById('to').value.trim();
-      const log = document.getElementById('log');
-      log.textContent = 'Sending WhatsApp message...';
-      try {
-        const res = await fetch('/api/send', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(to ? { to } : {})
-        });
-        const data = await res.json();
-        log.textContent = JSON.stringify(data, null, 2);
-      } catch (e) {
-        log.textContent = 'Error: ' + e.message;
-      }
-    }
-
-    // Check server health
-    async function checkHealth() {
-      const status = document.getElementById('healthStatus');
-      status.textContent = 'Checking server health...';
-      try {
-        const res = await fetch('/api/health');
-        const data = await res.json();
-        status.innerHTML = `
-          <p>✅ Status: ${data.status}</p>
-          <p>🕐 Uptime: ${Math.floor(data.environment.uptime / 60)} minutes</p>
-          <p>🌏 Timezone: ${data.environment.timezone}</p>
-          <p>📱 WhatsApp Config: ${data.config.hasToken ? '✅ Ready' : '❌ Missing Token'}</p>
-        `;
-      } catch (e) {
-        status.textContent = '❌ Health check failed: ' + e.message;
-      }
-    }
-
-    document.getElementById('sendBtn').addEventListener('click', send);
-    document.getElementById('healthBtn').addEventListener('click', checkHealth);
-
-    // Auto-check health on page load
-    checkHealth();
-  </script>
+  <!-- Scripts -->
+  <script src="/js/app.js"></script>
+  <script src="/js/scheduler.js"></script>
 </body>
+
 </html>
