@@ -1,147 +1,144 @@
-# 📱 WhatsApp Automation Bot
+# 📱 WhatsApp Automation
 
-A powerful, automated WhatsApp message scheduler with a premium dark-themed web interface. Schedule one-time or recurring messages with ease using the WhatsApp Business API.
+> **Automate WhatsApp messages with scheduling and templates**  
+> A clean, production-ready tool anyone can deploy to Render for their business.
 
 ![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## ✨ Features
 
-- **📤 Instant Messaging**: Send WhatsApp messages immediately
-- **⏰ Smart Scheduling**: Schedule messages for specific times or recurring intervals
-- **🎨 Premium UI**: Beautiful dark-themed interface with glassmorphism effects
-- **🔄 Recurring Messages**: Set up daily, weekly, or custom cron-based schedules
-- **💾 Persistent Storage**: Scheduled messages survive server restarts
-- **📊 Real-time Status**: Monitor server health and scheduled messages
-- **🎯 Template Support**: Use approved WhatsApp templates or custom messages
-- **🌐 RESTful API**: Clean API endpoints for all operations
-
-## 🏗️ Architecture
-
-```
-Automated-whatsapp-message/
-├── src/
-│   ├── config/
-│   │   └── environment.js      # Environment configuration
-│   ├── services/
-│   │   ├── whatsapp.service.js # WhatsApp API integration
-│   │   └── scheduler.service.js # Message scheduling logic
-│   ├── routes/
-│   │   ├── message.routes.js   # Message endpoints
-│   │   └── health.routes.js    # Health check endpoints
-│   ├── middleware/
-│   │   ├── validation.js       # Input validation
-│   │   └── errorHandler.js     # Error handling
-│   └── utils/
-│       └── logger.js           # Logging utility
-├── public/
-│   ├── css/
-│   │   ├── design-system.css   # Design tokens & utilities
-│   │   └── components.css      # UI components
-│   ├── js/
-│   │   ├── app.js             # Main application logic
-│   │   └── scheduler.js       # Scheduling UI logic
-│   └── index.html             # Main interface
-├── data/
-│   └── scheduled-jobs.json    # Persisted scheduled messages
-├── server.js                  # Application entry point
-├── .env                       # Environment variables (not in git)
-├── .env.example              # Environment template
-└── package.json              # Dependencies
-
-```
+- 📤 **Send Messages** - Instant WhatsApp messages via Business API
+- ⏰ **Schedule Messages** - One-time or recurring (cron-based)
+- 📋 **Manage Schedules** - View and cancel scheduled messages
+- 🎯 **Template Support** - Use approved WhatsApp message templates
+- 🔒 **Production Ready** - Error handling, validation, logging
+- 📱 **Responsive UI** - Clean, minimal interface that works everywhere
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### 1. Clone & Install
 
-- Node.js >= 18.0.0
-- WhatsApp Business API account
-- Meta Developer account with approved WhatsApp Business app
+```bash
+git clone https://github.com/yourusername/Automated-whatsapp-message.git
+cd Automated-whatsapp-message
+npm install
+```
 
-### Installation
+### 2. Get WhatsApp Business API Credentials
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/Automated-whatsapp-message.git
-   cd Automated-whatsapp-message
+You need a WhatsApp Business API account. Here's how:
+
+1. Go to [Meta for Developers](https://developers.facebook.com/)
+2. Create an app and select "Business" type
+3. Add "WhatsApp" product to your app
+4. Get your credentials:
+   - **Phone Number ID**: Found in WhatsApp > API Setup
+   - **Access Token**: Generate in WhatsApp > API Setup
+   - **Graph API Version**: Use `v22.0` (or latest)
+
+📖 **Detailed Guide**: See [WHATSAPP_SETUP.md](./WHATSAPP_SETUP.md) for step-by-step instructions
+
+### 3. Configure Environment
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your credentials:
+
+```env
+PHONE_NUMBER_ID=your_phone_number_id_here
+WHATSAPP_TOKEN=your_access_token_here
+GRAPH_VERSION=v22.0
+PORT=3000
+```
+
+### 4. Run Locally
+
+```bash
+npm start
+```
+
+Open http://localhost:3000 in your browser.
+
+## 🌐 Deploy to Render
+
+### One-Click Deploy
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
+### Manual Deployment
+
+1. **Create a new Web Service** on [Render](https://render.com)
+2. **Connect your GitHub repository**
+3. **Configure**:
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+4. **Add Environment Variables**:
    ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment variables**
-   ```bash
-   cp .env.example .env
-   ```
-   
-   Edit `.env` and add your credentials:
-   ```env
-   PHONE_NUMBER_ID=your_phone_number_id
-   WHATSAPP_TOKEN=your_access_token
-   RECIPIENT=919444539625
+   PHONE_NUMBER_ID=your_value
+   WHATSAPP_TOKEN=your_value
    GRAPH_VERSION=v22.0
    PORT=3000
    ```
+5. **Deploy!**
 
-4. **Start the server**
-   ```bash
-   npm start
-   ```
+📖 **Detailed Guide**: See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete instructions
 
-5. **Open your browser**
-   Navigate to `http://localhost:3000`
+## 📡 API Reference
 
-## 📡 API Endpoints
+### Send Message
 
-### Send Immediate Message
 ```http
 POST /api/messages/send
 Content-Type: application/json
 
 {
   "to": "919444539625",
-  "message": "Hello from WhatsApp Bot!" // Optional
+  "message": "Hello!" // Optional - leave empty for template
 }
 ```
 
 ### Schedule Message (One-time)
+
 ```http
 POST /api/messages/schedule
 Content-Type: application/json
 
 {
   "to": "919444539625",
-  "message": "Scheduled message",
+  "message": "Reminder",
   "scheduledTime": "2026-01-10T17:00:00.000Z"
 }
 ```
 
 ### Schedule Message (Recurring)
+
 ```http
 POST /api/messages/schedule
 Content-Type: application/json
 
 {
   "to": "919444539625",
-  "message": "Daily reminder",
-  "cronExpression": "0 17 * * *"
+  "cronExpression": "0 17 * * *" // Daily at 5 PM
 }
 ```
 
 ### List Scheduled Messages
+
 ```http
 GET /api/messages/scheduled
 ```
 
 ### Cancel Scheduled Message
+
 ```http
 DELETE /api/messages/scheduled/:id
 ```
 
 ### Health Check
+
 ```http
 GET /api/health
 ```
@@ -150,42 +147,11 @@ GET /api/health
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `PHONE_NUMBER_ID` | WhatsApp Business phone number ID | ✅ Yes | - |
-| `WHATSAPP_TOKEN` | WhatsApp Business API access token | ✅ Yes | - |
-| `RECIPIENT` | Default recipient phone number | ❌ No | - |
-| `GRAPH_VERSION` | Facebook Graph API version | ❌ No | `v22.0` |
-| `PORT` | Server port | ❌ No | `3000` |
-| `NODE_ENV` | Environment (development/production) | ❌ No | `development` |
-
-## 🎨 Features Showcase
-
-### Premium Dark Theme
-- Vibrant gradient accents
-- Glassmorphism effects
-- Smooth animations and transitions
-- Responsive design for all devices
-
-### Smart Scheduling
-- **One-time**: Schedule messages for specific dates and times
-- **Recurring**: Use cron expressions for repeating schedules
-  - Daily at 5 PM: `0 17 * * *`
-  - Every Monday at 10 AM: `0 10 * * 1`
-  - Every hour: `0 * * * *`
-
-### Message Management
-- View all scheduled messages
-- Cancel scheduled messages
-- Real-time status updates
-- Toast notifications for all actions
-
-## 🔧 Development
-
-The project uses a clean, modular architecture:
-
-- **Services**: Business logic (WhatsApp API, scheduling)
-- **Routes**: API endpoints
-- **Middleware**: Validation and error handling
-- **Utils**: Shared utilities (logging)
+| `PHONE_NUMBER_ID` | WhatsApp Business phone number ID | ✅ | - |
+| `WHATSAPP_TOKEN` | WhatsApp Business API access token | ✅ | - |
+| `GRAPH_VERSION` | Facebook Graph API version | ❌ | `v22.0` |
+| `PORT` | Server port | ❌ | `3000` |
+| `RECIPIENT` | Default recipient (optional) | ❌ | - |
 
 ## 📝 Cron Expression Examples
 
@@ -197,25 +163,93 @@ The project uses a clean, modular architecture:
 0 12 1 * *      # First day of month at noon
 ```
 
-## 🛡️ Security
+## ⚠️ Important Notes
 
-- Environment variables stored in `.env` (not committed to git)
-- Input validation on all endpoints
-- Phone number format validation (E.164)
-- Error handling with sanitized responses
+### WhatsApp Message Limitations
+
+- **Template Messages**: Work immediately (must be pre-approved in Meta Business Manager)
+- **Custom Text Messages**: Require an active 24-hour conversation window
+  - Window opens when recipient messages you first
+  - Window lasts 24 hours from their last message
+  - Use templates if no active window exists
+
+### Phone Number Format
+
+Use E.164 format: `[country_code][number]`
+- ✅ Correct: `919444539625`
+- ❌ Wrong: `+91 9444539625`, `9444539625`
+
+## 🏗️ Project Structure
+
+```
+├── src/
+│   ├── config/          # Environment configuration
+│   ├── services/        # WhatsApp API & scheduling logic
+│   ├── routes/          # API endpoints
+│   ├── middleware/      # Validation & error handling
+│   └── utils/           # Logging utilities
+├── public/
+│   ├── css/            # Styles
+│   ├── js/             # Frontend logic
+│   └── index.html      # Web interface
+├── data/               # Persisted scheduled jobs
+└── server.js           # Application entry point
+```
+
+## 🛠️ Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run in development mode
+npm start
+
+# The server will restart automatically on file changes
+```
+
+## 🔒 Security
+
+- ✅ Environment variables (never commit `.env`)
+- ✅ Input validation on all endpoints
+- ✅ Phone number format validation
+- ✅ Error handling with sanitized responses
+- ✅ CORS enabled for API access
+
+## 🐛 Troubleshooting
+
+### "Template message failed"
+- Verify your template is approved in Meta Business Manager
+- Check template name matches exactly
+
+### "Cannot send custom text message"
+- You need an active 24-hour conversation window
+- Use a template message instead
+- Or wait for recipient to message you first
+
+### "Rate limit exceeded"
+- WhatsApp has rate limits
+- Wait a few minutes before sending more messages
+
+### Server won't start
+- Check all environment variables are set
+- Verify Node.js version >= 18.0.0
+- Check port 3000 is not in use
 
 ## 📄 License
 
-MIT License - feel free to use this project for personal or commercial purposes.
+MIT License - Free for personal and commercial use
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions welcome! Please open an issue or submit a PR.
 
 ## 📧 Support
 
-For issues or questions, please open an issue on GitHub.
+- 📖 [Documentation](./docs/)
+- 🐛 [Report Issues](https://github.com/yourusername/Automated-whatsapp-message/issues)
+- 💬 [Discussions](https://github.com/yourusername/Automated-whatsapp-message/discussions)
 
 ---
 
-**Made with ❤️ for automated WhatsApp messaging**
+**Made for automated WhatsApp messaging** 🚀
