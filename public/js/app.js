@@ -256,9 +256,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let cronExpression = null;
 
         if (type === 'one-time') {
-            const dateTime = document.getElementById('scheduleDateTime').value;
+            const dateTime = window.getScheduledDateTime();
             if (!dateTime) {
-                showToast('Please select a date and time', 'error');
+                showToast('Please select date, hour, and minute', 'error');
                 return;
             }
             scheduledTime = new Date(dateTime).toISOString();
